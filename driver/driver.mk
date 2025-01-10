@@ -14,7 +14,7 @@ DRIVER_MAKEFILE_=included
 -include config.mk
 
 # Get the libaxidma include paths
-include library/library.mk
+include xilinx_axidma/library/library.mk
 
 ################################################################################
 # Configuration
@@ -42,7 +42,7 @@ endif
 KERNEL_SYMS = $(KBUILD_DIR)/Module.symvers
 
 # The list of source files for the driver. Export the names to the Kbuild file.
-DRIVER_DIR = driver
+DRIVER_DIR = xilinx_axidma/driver
 export AXIDMA_FILES = axi_dma.c axidma_chrdev.c axidma_dma.c axidma.h \
 		axidma_of.c
 DRIVER_PATHS = $(addprefix $(DRIVER_DIR)/,$(AXIDMA_FILES))

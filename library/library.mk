@@ -19,12 +19,12 @@ LIBAXIDMA_CFLAGS = $(GLOBAL_CFLAGS) -fPIC -shared \
 				   -Wno-missing-field-initializers
 
 # The files that makeup the AXI DMA library
-LIBAXIDMA_DIR = library
+LIBAXIDMA_DIR = xilinx_axidma/library
 LIBAXIDMA_FILES = libaxidma.c
 LIBAXIDMA = $(addprefix $(LIBAXIDMA_DIR)/,$(LIBAXIDMA_FILES))
 
 # The header files for the AXI DMA library interface
-LIBAXIDMA_INC_DIRS = include
+LIBAXIDMA_INC_DIRS = xilinx_axidma/include
 LIBAXIDMA_INC_FILES = libaxidma.h axidma_ioctl.h
 LIBAXIDMA_INC = $(addprefix $(LIBAXIDMA_INC_DIRS)/,$(LIBAXIDMA_INC_FILES))
 LIBAXIDMA_INC_FLAGS = $(addprefix -I ,$(LIBAXIDMA_INC_DIRS))

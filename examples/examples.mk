@@ -9,14 +9,14 @@ ifndef EXAMPLES_MAKEFILE_
 EXAMPLES_MAKEFILE_=included
 
 # Get the definitions for the AXI DMA library
-include library/library.mk
+include xilinx_axidma/library/library.mk
 
 ################################################################################
 # Configuration
 ################################################################################
 
 # The list of example programs
-EXAMPLES_DIR = examples
+EXAMPLES_DIR = xilinx_axidma/examples
 EXAMPLES_FILES = axidma_benchmark.c axidma_display_image.c axidma_transfer.c
 
 # The variations of specific targets for the example programs
