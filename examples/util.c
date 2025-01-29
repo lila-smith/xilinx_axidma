@@ -115,13 +115,15 @@ int robust_write(int fd, char *buf, int buf_size)
 {
     int bytes_remain, bytes_written;
     int buf_offset;
-
     // Read out the bytes into the buffer, accounting for EINTR
     bytes_remain = buf_size;
     while (true)
     {
         buf_offset = buf_size - bytes_remain;
+        
         bytes_written = write(fd, buf + buf_offset, bytes_remain);
+        printf("Offset: %d; Buffer Size: %d; Bytes Remaining: %d; Bytes Written: %d\n", buf_offset, buf_size, bytes_remain, bytes_written);
+        printf("Successful write\n");
         bytes_remain = (bytes_written > 0) ? bytes_remain - bytes_written
                                            : bytes_remain;
 
@@ -130,7 +132,9 @@ int robust_write(int fd, char *buf, int buf_size)
         if (bytes_written < 0 && bytes_written != -EINTR) {
             return bytes_written;
         } else if (bytes_written == 0) {
-            return buf_size - bytes_remain;
+            printf("Done writing...returning\n");
+            // return buf_size - bytes_remain;
+            return buf_size;
         }
     }
 
