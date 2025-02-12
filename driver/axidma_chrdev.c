@@ -22,7 +22,7 @@
 #include <linux/slab.h>         // Kernel allocation functions
 #include <linux/errno.h>        // Linux error codes
 #include <linux/of_device.h>    // Device tree device related functions
-
+#include <linux/version.h>	// Enable Linux 5.4 support
 #include <linux/dma-buf.h>      // DMA shared buffers interface
 #include <linux/scatterlist.h>  // Scatter-gather table definitions
 
@@ -272,9 +272,13 @@ static int axidma_mmap(struct file *file, struct vm_area_struct *vma)
     // Set the user virtual address and the size
     dma_alloc->size = vma->vm_end - vma->vm_start;
     dma_alloc->user_addr = (void *)vma->vm_start;
-
+    
     // Configure the DMA device
-    of_dma_configure(dev->device, NULL);
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(4, 18, 0)
+    	of_dma_configure(dev->device, NULL);
+    #else 
+    	of_dma_configure(&dev->pdev->dev, NULL, true);
+    #endif
 
     // Allocate the requested region a contiguous and uncached for DMA
     dma_alloc->kern_addr = dma_alloc_coherent(&dev->pdev->dev, dma_alloc->size,
@@ -326,17 +330,29 @@ ret:
 static bool axidma_access_ok(const void __user *arg, size_t size, bool readonly)
 {
     // Note that VERIFY_WRITE implies VERIFY_WRITE, so read-write is handled
-    if (!readonly && !access_ok(VERIFY_WRITE, arg, size)) {
-        axidma_err("Argument address %p, size %zu cannot be written to.\n",
+    #if LINUX_VERSION_CODE < KERNEL_VERSION(5, 0, 0) 
+	if (!readonly && !access_ok(VERIFY_WRITE, arg, size)) {
+        	axidma_err("Argument address %p, size %zu cannot be written to.\n",
                    arg, size);
-        return false;
-    } else if (!access_ok(VERIFY_READ, arg, size)) {
-        axidma_err("Argument address %p, size %zu cannot be read from.\n",
+        	return false;
+    } 	else if (!access_ok(VERIFY_READ, arg, size)) {
+        	axidma_err("Argument address %p, size %zu cannot be read from.\n",
                    arg, size);
-        return false;
+        	return false;
     }
+    #else 
+	if (!readonly && !access_ok(arg, size)) {
+        	axidma_err("Argument address %p, size %zu cannot be written to.\n",
+                   arg, size);
+        	return false;
+    } 	else if (!access_ok(arg, size)) {
+        	axidma_err("Argument address %p, size %zu cannot be read from.\n",
+                   arg, size);
+        	return false;
+    }
+    #endif
 
-    return true;
+    	return true;
 }
 
 static long axidma_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
